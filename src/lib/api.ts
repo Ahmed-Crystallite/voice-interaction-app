@@ -36,7 +36,13 @@ export class VoiceInteractionAPI {
 
   private async convertBlobToWav(audioBlob: Blob): Promise<Blob> {
     return new Promise((resolve) => {
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+      if (!AudioContextClass) {
+        throw new Error("Web Audio API is not supported in this browser.");
+      }
+
+      const audioContext = new AudioContextClass();
       const reader = new FileReader();
       
       reader.onload = async () => {

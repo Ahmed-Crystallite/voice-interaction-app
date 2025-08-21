@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   Mic, 
-  MicOff, 
   Play, 
   Pause, 
   Square, 
@@ -22,6 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useVoiceRecorder } from '@/hooks/useVoiceRecorder';
 import { VoiceInteractionAPI, type GroqResponse, type ElevenLabsResponse } from '@/lib/api';
 
+
 interface ApiKeys {
   groq: string;
   elevenLabs: string;
@@ -31,14 +31,14 @@ export default function VoiceInteractionApp() {
   const [apiKeys, setApiKeys] = useState<ApiKeys>({ groq: '', elevenLabs: '' });
   const [showSettings, setShowSettings] = useState(true);
   const [responseText, setResponseText] = useState('');
-  const [transcribedText, setTranscribedText] = useState('');
+  const [_transcribedText, setTranscribedText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const [audioResponse, setAudioResponse] = useState<ElevenLabsResponse | null>(null);
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingStage, setProcessingStage] = useState('');
-  const [debugInfo, setDebugInfo] = useState<string>('');
+  const [_debugInfo, setDebugInfo] = useState<string>('');
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const api = VoiceInteractionAPI.getInstance();
@@ -53,7 +53,6 @@ export default function VoiceInteractionApp() {
     pauseRecording,
     resumeRecording,
     clearRecording,
-    isSupported,
   } = useVoiceRecorder();
 
   useEffect(() => {
@@ -61,7 +60,7 @@ export default function VoiceInteractionApp() {
       api.setApiKeys(apiKeys.groq, apiKeys.elevenLabs);
       setShowSettings(false);
     }
-  }, [apiKeys]);
+  }, [apiKeys,api]);
 
   useEffect(() => {
     if (audioResponse?.audioUrl && audioRef.current) {
@@ -80,6 +79,7 @@ export default function VoiceInteractionApp() {
       setError(null);
       await startRecording();
     } catch (error) {
+      console.error("Recording error:", error);
       setError('Failed to start recording. Please check your microphone permissions.');
     }
   };
